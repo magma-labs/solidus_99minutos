@@ -1,97 +1,68 @@
-# Run Coverage report
-require 'pry'
-require 'simplecov'
-SimpleCov.start do
-  add_filter 'spec/dummy'
-  add_group 'Controllers', 'app/controllers'
-  add_group 'Helpers', 'app/helpers'
-  add_group 'Mailers', 'app/mailers'
-  add_group 'Models', 'app/models'
-  add_group 'Views', 'app/views'
-  add_group 'Libraries', 'lib'
-end
-
 # Configure Rails Environment
-ENV['RAILS_ENV'] = 'test'
+ENV["RAILS_ENV"] = "test"
+require 'simplecov' if ENV['COVERAGE']
+require File.expand_path("../dummy/config/environment.rb",  __FILE__)
 
-require File.expand_path('../dummy/config/environment.rb',  __FILE__)
-
+require 'solidus_frontend'
 require 'rspec/rails'
-require 'database_cleaner'
-require 'ffaker'
-require 'vcr'
+require 'factory_bot'
 require 'webmock/rspec'
+require 'ffaker'
+require 'database_cleaner'
+require 'rails-controller-testing'
 
-EasyPost.api_key = 'CvzYtuda6KRI9JjG7SAHbA'
+# Run any available migration
+ActiveRecord::Migrator.migrate File.expand_path("../dummy/db/migrate/", __FILE__)
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
-Dir[File.join(File.dirname(__FILE__), 'support/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('spec/support/**/*.rb')].sort.each { |file| require file }
 
-# Requires factories defined in spree_core
-require 'spree/testing_support/factories'
+require 'spree/testing_support/url_helpers'
 require 'spree/testing_support/controller_requests'
 require 'spree/testing_support/authorization_helpers'
-require 'spree/testing_support/url_helpers'
+require 'spree/testing_support/factories/zone_factory'
+require 'spree/testing_support/preferences'
+require 'spree/testing_support/factories'
+require 'spree/api/testing_support/helpers'
+require 'spree/api/testing_support/setup'
+# require 'solidus_active_shipping/factories'
 
-# Requires factories defined in lib/spree_easypost/factories.rb
-require 'spree_easypost/factories'
-require 'factories/spree_modification'
+Dir[File.join(File.dirname(__FILE__), "factories/*.rb")].each {|f| require f }
 
-require 'helpers/shipping_method_helpers'
+require 'rspec/active_model/mocks'
 
 VCR.configure do |config|
+  config.ignore_localhost = true
   config.cassette_library_dir = 'spec/cassettes'
   config.hook_into :webmock
   config.configure_rspec_metadata!
 end
 
 RSpec.configure do |config|
-  config.include FactoryGirl::Syntax::Methods
+  config.infer_base_class_for_anonymous_controllers = false
+  config.use_transactional_fixtures = true
+  config.infer_spec_type_from_file_location!
 
-  # == URL Helpers
-  #
-  # Allows access to Spree's routes in specs:
-  #
-  # visit spree.admin_path
-  # current_path.should eql(spree.products_path)
+  config.include FactoryBot::Syntax::Methods
+  config.include Spree::Api::TestingSupport::Helpers, type: :controller
+  config.extend  Spree::Api::TestingSupport::Setup, type: :controller
+  config.include Spree::TestingSupport::ControllerRequests, type: :controller
   config.include Spree::TestingSupport::UrlHelpers
-  config.include ShippingMethodHelpers
+  config.include Spree::TestingSupport::Preferences, type: :controller
+  config.include Spree::TestingSupport::Preferences, type: :model
+  # config.include WebFixtures
 
-  # == Mock Framework
-  #
-  # If you prefer to use mocha, flexmock or RR, uncomment the appropriate line:
-  #
-  # config.mock_with :mocha
-  # config.mock_with :flexmock
-  # config.mock_with :rr
-  config.mock_with :rspec
-  config.color = true
-
-  # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
-
-  # Capybara javascript drivers require transactional fixtures set to false, and we use DatabaseCleaner
-  # to cleanup after each test instead.  Without transactional fixtures set to false the records created
-  # to setup a test will be unavailable to the browser, which runs under a separate server instance.
-  config.use_transactional_fixtures = false
-
-  # Ensure Suite is set to use transactions for speed.
   config.before :suite do
-    DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with :truncation
   end
 
-  # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
-  config.before :each do |example|
-    DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
+  config.before do
+    DatabaseCleaner.strategy = RSpec.current_example.metadata[:js] ? :truncation : :transaction
     DatabaseCleaner.start
   end
 
-  # After each spec clean the database.
-  config.after :each do
+  config.after do
     DatabaseCleaner.clean
   end
-
-  config.fail_fast = ENV['FAIL_FAST'] || false
 end

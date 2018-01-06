@@ -1,0 +1,9 @@
+<!-- insert_after "erb[loud]:contains('address2')" -->
+
+<% if address.country.iso == 'MX' %>
+  <p class="field" id=<%="#{address_id}address3" %>>
+<% else %>
+  <p class="field" id=<%="#{address_id}address3" %> hidden="true">
+<% end %>
+  <%= form.text_field :address3, autocomplete: address_type + ' address-line3', placeholder: true %>
+</p>

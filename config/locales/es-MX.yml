@@ -1,0 +1,6 @@
+es-MX:
+  spree:
+    ninety_nine_minutes:
+      settings: 99 Minutes Configuracion
+      same_day: 99 Minutos Mismo Dia
+      express: 99 Minutos 99 Minutos
