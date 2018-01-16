@@ -1,6 +1,30 @@
 en:
+  activemodel:
+    spree/shipping_provider:
+      one: Shipping Provider
+      other: Shipping Providers
+    attributes:
+      spree/shipping_provider:
+        name: Nombre
+        reference: Referencia
+        state: Estado
+  activerecord:
+    models:
+      spree/shipping_provider:
+        one: Shipping Provider
+        other: Shipping Providers
   spree:
+    shipping_provider:
+      ready: Ready
+      ship: Shipped
+      error: Error
     ninety_nine_minutes:
       settings: 99 Minutes Settings
-      same_day: Same Day
-      express: 99 Minutes
+      same_day:
+        bicycle: 99 Minutos Same Day Bicycle
+        bike: 99 Minutos Same Day Bike
+        mini: 99 Minutos Same Day Mini
+      express:
+        bicycle: 99 Minutos Express Bicycle
+        bike: 99 Minutos Express Bike
+      cant_ship: Something went wrong, please check the shipment information

@@ -1,0 +1,12 @@
+<!-- insert_bottom 'dl.additional-info' -->
+
+<% if @order.shipping_providers %>
+  <% @order.shipping_providers.each do |shipping_provider| %>
+    <dt class="order-shipping_provider_state"><%= Spree::ShippingProvider.model_name.human %>: </dt>
+    <dd class="order-shipment_state" id='shipping_provider_status'>
+      <span class="pill pill-<%= shipping_provider.state %>">
+        <%= Spree.t(shipping_provider.state, scope: 'shipping_provider') %>
+      </span>
+    </dd>
+  <% end %>
+<% end %>

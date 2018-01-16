@@ -17,6 +17,7 @@ module Solidus99minutos
     initializer 'solidus_99minutos.environment', before: 'spree.environment' do
       Spree::Solidus99minutos::Config = Solidus99minutos::Configuration.new
       ActiveShipping::Carriers.register :NinetyNineMinutes,'active_shipping/carriers/ninety_nine_minutes'
+      Spree::PermittedAttributes.address_attributes.push :address3
     end
 
     def self.activate
@@ -29,6 +30,10 @@ module Solidus99minutos
       end
 
       Dir.glob(File.join(File.dirname(__FILE__), "../app/overrides/*.rb")) do |c|
+        Rails.configuration.cache_classes ? require(c) : load(c)
+      end
+
+      Dir.glob(File.join(File.dirname(__FILE__), "../app/services/*.rb")) do |c|
         Rails.configuration.cache_classes ? require(c) : load(c)
       end
     end

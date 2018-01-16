@@ -2,7 +2,6 @@ require 'net/http'
 require 'net/https'
 
 module ActiveShipping
-
   # 99minutos carrier implementation.
   #
   # 99minutos module by Jonathan Tapia (http://github.com/jtapia)
@@ -11,6 +10,14 @@ module ActiveShipping
 
     cattr_reader :name
     @@name = '99 Minutos'
+
+    SERVICE_TYPES = {
+      '99_bicycle':   'expressBicycle',
+      '99_bike':      'expressBike',
+      'sameday_mini': 'sameDayBycicle',
+      'sameday_bike': 'sameDayBike',
+      'sameday_mini': 'sameDayMini'
+    }
 
     HOST = {
       test: 'deploy-dot-precise-line-76299minutos.appspot.com',
@@ -22,6 +29,11 @@ module ActiveShipping
     def requirements
       [:api_key, :user_id]
     end
+
+    def self.service_code(rate)
+      SERVICE_TYPES["#{rate['type']}_#{rate['vehicle']}".downcase.to_sym]
+    end
+
 
     def find_rates(origin, destination, packages, options = {})
       packages = Array(packages)
@@ -79,10 +91,10 @@ module ActiveShipping
 
       def rate_options(rates)
         {
-          service_name:       rates.first[:service_name],
-          service_code:       rates.first[:service_code],
-          total_price:        rates.first[:total_price],
-          currency:           'MXN'
+          service_name: rates.first[:service_name],
+          service_code: rates.first[:service_code],
+          total_price:  rates.first[:total_price],
+          currency:     'MXN'
         }
       end
 
@@ -110,7 +122,7 @@ module ActiveShipping
         @options     = options
         @package     = NinetyNineMinutesPackage.new(package)
         @rates       = []
-        @test        = true #@options[:test]
+        @test        = @options[:test]
       end
 
       def url
@@ -126,14 +138,16 @@ module ActiveShipping
 
         raise ActiveShipping::ResponseError, 'No Shipping' if @response['status'] == "Error"
 
-        @rates        = @response['rates'].map do |service|
-                          {
-                            service_name: service['title'],
-                            service_code: service['type'],
-                            total_price:  service['cost'].to_f,
-                            currency:     'MXN'
-                          }
-                        end
+        @rates = @response['rates'].map do |service|
+                   {
+                     service_name: NinetyNineMinutes.service_code(service),
+                     service_code: NinetyNineMinutes.service_code(service),
+                     total_price:  service['cost'].to_f,
+                     vehicle:      service['vehicle'],
+                     type:         service['type'],
+                     currency:     'MXN'
+                   }
+                 end
       end
 
       def params
@@ -186,12 +200,6 @@ module ActiveShipping
         }.
         # INFO: equivalent of .compact
         select { |_, value| !value.nil? }
-      end
-    end
-
-    class NinetyNineMinutesRateEstimate < RateEstimate
-      def initialize(origin, destination, carrier, service_name, options = {})
-        super
       end
     end
 

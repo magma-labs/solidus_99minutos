@@ -1,6 +1,32 @@
 es-MX:
+  activemodel:
+    spree/shipping_provider:
+      one: Proveedor de Envio
+      other: Proveedores de Envios
+    attributes:
+      spree/shipping_provider:
+        name: Nombre
+        reference: Referencia
+        state: Estado
+  activerecord:
+    models:
+      spree/shipping_provider:
+        one: Proveedor de Envio
+        other: Proveedores de Envios
   spree:
+    admin:
+      shipping_provider: Proveedor de Envio
+    shipping_provider:
+      ready: Listo para enviar
+      shipped: Enviado
+      error: Error
     ninety_nine_minutes:
       settings: 99 Minutes Configuracion
-      same_day: 99 Minutos Mismo Dia
-      express: 99 Minutos 99 Minutos
+      same_day:
+        bicycle: 99 Minutos Mismo Dia Motocicleta
+        bike: 99 Minutos Mismo Dia Bicicleta
+        mini: 99 Minutos Mismo Dia Mini
+      express:
+        bicycle: 99 Minutos Express Motocicleta
+        bike: 99 Minutos Express Bicicleta
+      cant_ship: Hubo un error al tratar de enviar la orden al provider, favor de checar la orden

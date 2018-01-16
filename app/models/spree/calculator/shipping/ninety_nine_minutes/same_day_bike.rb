@@ -1,13 +1,13 @@
 module Spree
   module Calculator::Shipping
     module NinetyNineMinutes
-      class SameDay < Spree::Calculator::Shipping::NinetyNineMinutes::Base
+      class SameDayBike < Spree::Calculator::Shipping::NinetyNineMinutes::Base
         def self.description
-          Spree.t('ninety_nine_minutes.same_day')
+          Spree.t('ninety_nine_minutes.same_day.bike')
         end
 
         def self.service_code
-          'sameDay'
+          'sameDayBike'
         end
       end
     end
