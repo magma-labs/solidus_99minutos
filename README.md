@@ -11,7 +11,7 @@ Once you create the 99 minutos shipping methods, please use the next values as c
   [type: "sameDay", vehicle: "mini", title: "Motocarro entrega mismo d\u00eda (Solicitando antes de las 12 hrs)"] => 'sameDayMini',
   [type: "sameDay", vehicle: "bike", title: "Entrega mismo d\u00eda (Solicitando antes de las 17 hrs)"] = 'sameDayBike',
   [type: "sameDay", vehicle: "bicycle", title: "Bicicleta entrega mismo d\u00eda (Solicitando antes de las 17 hrs)"] => 'sameDayBycicle'
-```ruby
+```
 
 ## Installation
 
