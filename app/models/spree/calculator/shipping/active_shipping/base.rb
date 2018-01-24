@@ -49,10 +49,10 @@ module Spree
         def timing(line_items)
           order = line_items.first.order
           # TODO: Figure out where stock_location is supposed to come from.
-          origin = ::ActiveShipping::Location.new(country: stock_location.country.iso,
-                                                  city: stock_location.city,
-                                                  state: (stock_location.state ? stock_location.state.abbr : stock_location.state_name),
-                                                  zip: stock_location.zipcode)
+          origin = ::ActiveShipping::Location.new(country: stock_location.country.try(:iso),
+                                                  city: stock_location.try(:city),
+                                                  state: (stock_location.try(:state) ? stock_location.try(:state).try(:abbr) : stock_location.try(:state_name)),
+                                                  zip: stock_location.try(:zipcode))
           addr = order.ship_address
           destination = ::ActiveShipping::Location.new(country: addr.country.iso,
                                                        state: (addr.state ? addr.state.abbr : addr.state_name),
@@ -181,14 +181,14 @@ module Spree
         end
 
         def fetch_best_state_from_address(address)
-          address.state ? address.state.abbr : address.state_name
+          address.try(:state) ? address.try(:state).try(:abbr) : address.try(:state_name)
         end
 
         def build_location(address)
-          ::ActiveShipping::Location.new(country: address.country.iso,
+          ::ActiveShipping::Location.new(country: address.country.try(:iso),
                                          state: fetch_best_state_from_address(address),
-                                         city: address.city,
-                                         zip: address.zipcode)
+                                         city: address.try(:city),
+                                         zip: address.try(:zipcode))
         end
 
         def retrieve_rates_from_cache(package, origin, destination, max_weight)
