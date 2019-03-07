@@ -137,8 +137,9 @@ module ActiveShipping
         @response     = JSON.parse(data)
 
         raise ActiveShipping::ResponseError, 'No Shipping' if @response['status'] == "Error"
+        return nil if @response['status'] == 'Block'
 
-        @rates = @response['rates'].map do |service|
+        @rates = @response['rates'].to_a.map do |service|
                    {
                      service_name: NinetyNineMinutes.service_code(service),
                      service_code: NinetyNineMinutes.service_code(service),
